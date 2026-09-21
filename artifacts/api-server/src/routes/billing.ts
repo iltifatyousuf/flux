@@ -41,8 +41,8 @@ router.post("/whop/checkout", async (req, res) => {
         plan_id: planId,
         redirect_url: `${origin}/pricing?checkout=complete`,
       }),
-    });
-    const result = await response.json() as { id?: string; purchase_url?: string; url?: string; error?: { message?: string } };
+    }) as any;
+    const result = await response.json();
     if (!response.ok) throw new Error(result.error?.message || "Whop checkout request failed.");
     if (!result.purchase_url && !result.url) {
       throw new Error("Whop did not return a hosted checkout URL.");
