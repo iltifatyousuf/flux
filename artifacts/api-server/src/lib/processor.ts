@@ -132,7 +132,7 @@ async function generateWithOpenAI(task: string, source: string): Promise<string 
         max_completion_tokens: 4000,
       }),
       signal: AbortSignal.timeout(45_000),
-    });
+    }) as any;
     if (!response.ok) return null;
     const payload = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
     return payload.choices?.[0]?.message?.content?.trim() || null;

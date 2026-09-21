@@ -28,7 +28,7 @@ async function initWhopClient(): Promise<WhopClient> {
       headers: { Accept: 'application/json', X_REPLIT_TOKEN: xReplitToken },
       signal: AbortSignal.timeout(10_000),
     },
-  );
+  ) as any;
 
   if (!resp.ok) {
     throw new Error(`Failed to fetch Whop credentials: ${resp.status} ${resp.statusText}`);
