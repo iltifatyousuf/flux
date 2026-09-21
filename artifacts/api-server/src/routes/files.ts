@@ -52,11 +52,13 @@ router.post("/files", async (req, res) => {
   
   await writeFile(filePath, buffer);
   
+  const mime = input.data.mimeType || "application/octet-stream";
+  
   await db.insert(filesTable).values({
     id: fileId,
     name: input.data.name,
     size: input.data.size,
-    mimeType: input.data.mimeType,
+    mimeType: mime,
     storagePath: filePath,
     createdAt: new Date(),
   });
@@ -64,7 +66,7 @@ router.post("/files", async (req, res) => {
   const file: FileRecord = {
     id: fileId,
     name: input.data.name,
-    kind: input.data.mimeType.split("/")[1]?.toUpperCase() || "FILE",
+    kind: mime.split("/")[1]?.toUpperCase() || "FILE",
     size: input.data.size,
     status: "ready",
     createdAt: new Date().toISOString(),
