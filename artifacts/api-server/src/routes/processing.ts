@@ -155,7 +155,10 @@ async function executeJob(jobId: string, question?: string) {
 
 router.get("/processing/jobs/:id", async (req, res) => {
   const params = GetProcessingJobParams.safeParse(req.params);
-  if (!params.success) return res.status(404).json({ error: "Invalid ID." });
+  if (!params.success) {
+    res.status(404).json({ error: "Invalid ID." });
+    return;
+  }
   
   const [job] = await db.select().from(jobsTable).where(eq(jobsTable.id, params.data.id));
   if (!job) {
@@ -176,6 +179,7 @@ router.get("/processing/jobs/:id", async (req, res) => {
   if (responseJob.status === "error" as any) responseJob.status = "failed"; // Normalizing schema 'error' to api 'failed'
   
   res.json(GetProcessingJobResponse.parse(responseJob));
+  return;
 });
 
 router.get("/processing/jobs/:id/result", async (req, res) => {

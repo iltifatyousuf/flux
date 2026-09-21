@@ -51,8 +51,14 @@ router.post("/auth/whop-bridge", async (req, res) => {
   const { whopToken } = req.body;
   const token = req.cookies?.flux_session;
   
-  if (!token) return res.status(401).json({ error: "Not logged in" });
-  if (!whopToken) return res.status(400).json({ error: "No Whop token provided" });
+  if (!token) {
+    res.status(401).json({ error: "Not logged in" });
+    return;
+  }
+  if (!whopToken) {
+    res.status(400).json({ error: "No Whop token provided" });
+    return;
+  }
   
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };

@@ -77,7 +77,10 @@ router.post("/files", async (req, res) => {
 
 router.get("/files/:id", async (req, res) => {
   const params = GetFileParams.safeParse(req.params);
-  if (!params.success) return res.status(404).json({ error: "Invalid ID." });
+  if (!params.success) {
+    res.status(404).json({ error: "Invalid ID." });
+    return;
+  }
   
   const [f] = await db.select().from(filesTable).where(eq(filesTable.id, params.data.id));
   if (!f) {
