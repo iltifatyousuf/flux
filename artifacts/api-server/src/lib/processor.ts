@@ -228,7 +228,8 @@ async function pdfOperation(input: Buffer, name: string, operation: string): Pro
 }
 
 async function makePresentation(text: string, name: string): Promise<ProcessorResult> {
-  const pptx = new PptxGenJS();
+  const PptxConstructor = PptxGenJS as any;
+  const pptx = new PptxConstructor();
   pptx.layout = "LAYOUT_WIDE";
   const chunks = lines(text).slice(0, 12);
   for (const [index, chunk] of (chunks.length ? chunks : ["No readable text found"]).entries()) {
