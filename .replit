@@ -1,0 +1,32 @@
+modules = ["nodejs-24", "python-base-3.13"]
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+WHOP_COMPANY_ID = "biz_01KRYRQ798VJJF614K8JV552KH"
+WHOP_PLAN_ID = "plan_ZexX1uLH2KO3P"
+WHOP_PRODUCT_ID = "prod_rzdAlXjKSwZax"
+WHOP_PLAN_PURCHASE_URL = "https://whop.com/checkout/plan_ZexX1uLH2KO3P"
+
+[nix]
+channel = "stable-25_05"
+packages = ["tesseract"]

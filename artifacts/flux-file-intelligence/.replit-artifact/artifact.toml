@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "FLUX File Intelligence"
+description = "A universal file transformation and document intelligence workspace for uploading, converting, compressing, analyzing, and exporting files."
+version = "1.0.0"
+id = "artifacts/flux-file-intelligence"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19893
+
+[services.development]
+run = "pnpm --filter @workspace/flux-file-intelligence run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/flux-file-intelligence", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/flux-file-intelligence/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19893"
+BASE_PATH = "/"

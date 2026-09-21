@@ -1,0 +1,206 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: files
+    description: File workspace operations
+  - name: dashboard
+    description: Dashboard summaries
+  - name: processing
+    description: File processing operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /files:
+    get:
+      operationId: listFiles
+      tags: [files]
+      summary: List workspace files
+      responses:
+        "200":
+          description: Workspace files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FileRecord"
+    post:
+      operationId: createFile
+      tags: [files]
+      summary: Register an uploaded file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FileInput"
+      responses:
+        "201":
+          description: Registered file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileRecord"
+  /files/{id}:
+    get:
+      operationId: getFile
+      tags: [files]
+      summary: Get a workspace file
+      parameters:
+        - $ref: "#/components/parameters/FileId"
+      responses:
+        "200":
+          description: Workspace file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileRecord"
+        "404":
+          description: File not found
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /processing/jobs:
+    post:
+      operationId: createProcessingJob
+      tags: [processing]
+      summary: Start a file processing job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessingInput"
+      responses:
+        "201":
+          description: Processing job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessingJob"
+  /processing/jobs/{id}:
+    get:
+      operationId: getProcessingJob
+      tags: [processing]
+      summary: Get processing job status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Processing job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessingJob"
+components:
+  parameters:
+    FileId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    FileRecord:
+      type: object
+      required: [id, name, kind, size, status, createdAt]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        kind: { type: string }
+        size: { type: number }
+        status: { type: string, enum: [ready, processing, error] }
+        createdAt: { type: string }
+        pages: { type: ["number", "null"] }
+    FileInput:
+      type: object
+      required: [name, kind, size]
+      properties:
+        name: { type: string, minLength: 1 }
+        kind: { type: string }
+        size: { type: number, minimum: 0 }
+        pages: { type: ["number", "null"] }
+        contentBase64: { type: string }
+        mimeType: { type: string }
+    DashboardSummary:
+      type: object
+      required: [filesProcessed, storageUsed, aiRequests, plan, usagePercent, recentActivity]
+      properties:
+        filesProcessed: { type: number }
+        storageUsed: { type: string }
+        aiRequests: { type: number }
+        plan: { type: string }
+        usagePercent: { type: number }
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/Activity"
+    Activity:
+      type: object
+      required: [id, label, detail, time]
+      properties:
+        id: { type: string }
+        label: { type: string }
+        detail: { type: string }
+        time: { type: string }
+    ProcessingInput:
+      type: object
+      required: [fileId, operation]
+      properties:
+        fileId: { type: string }
+        operation: { type: string }
+        question:
+          type: string
+          description: Optional user question for document-intelligence operations.
+    ProcessingJob:
+      type: object
+      required: [id, fileId, operation, status, progress, message]
+      properties:
+        id: { type: string }
+        fileId: { type: string }
+        operation: { type: string }
+        status: { type: string, enum: [queued, processing, completed, failed] }
+        progress: { type: number }
+        message: { type: string }
+        resultUrl: { type: string }
+        resultName: { type: string }
+        resultContentType: { type: string }
+
