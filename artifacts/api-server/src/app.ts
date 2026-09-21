@@ -8,6 +8,7 @@ import { logger } from "./lib/logger";
 const app: Express = express();
 
 app.use(
+  // @ts-ignore - TS bundler resolution conflicts with pino-http CJS export
   pinoHttp({
     logger,
     serializers: {
